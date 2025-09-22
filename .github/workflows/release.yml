@@ -1,0 +1,99 @@
+name: Build pxpl
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+      packages: write
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Generate Version
+      id: version
+      run: |
+        # Get the number of commits on main/master branch
+        $commitCount = git rev-list --count HEAD
+        $version = "v0.$commitCount"
+        echo "VERSION=$version" >> $env:GITHUB_OUTPUT
+        echo "Generated version: $version"
+    
+    - name: Setup MSVC
+      uses: microsoft/setup-msbuild@v2
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    - name: Install Python dependencies
+      run: |
+        cd tests
+        pip install -r requirements.txt
+    
+    - name: Build Stealth Release
+      run: |
+        cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS_RELEASE="/O1 /DNDEBUG /GL /Gy /GS- /Gm- /fp:fast" -DCMAKE_EXE_LINKER_FLAGS_RELEASE="/LTCG /OPT:REF /OPT:ICF /MERGE:.rdata=.text /MERGE:.pdata=.text"
+        cmake --build build --config Release
+    
+    - name: Run Tests
+      run: |
+        python tests/pxpl_test.py test
+    
+    - name: Package Binaries
+      run: |
+        mkdir package
+        copy release\pxpl.exe package\
+        copy release\pxpl-gui.exe package\
+        copy README.md package\
+    
+    - name: Get Binary Sizes
+      id: sizes
+      run: |
+        $cli_size = (Get-Item "release\pxpl.exe").Length
+        $gui_size = (Get-Item "release\pxpl-gui.exe").Length
+        echo "CLI_SIZE=$([math]::Round($cli_size/1KB, 1))KB" >> $env:GITHUB_OUTPUT
+        echo "GUI_SIZE=$([math]::Round($gui_size/1KB, 1))KB" >> $env:GITHUB_OUTPUT
+    
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: pxpl-windows-x64
+        path: package/
+    
+    - name: Create Release Package
+      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+      run: |
+        Compress-Archive -Path package\* -DestinationPath pxpl-windows-x64.zip
+    
+    - name: Create or Update Release
+      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ steps.version.outputs.VERSION }}
+        name: "Pixel Payload ${{ steps.version.outputs.VERSION }}"
+        files: |
+          pxpl-windows-x64.zip
+        body: |
+          ## Pixel Payload ${{ steps.version.outputs.VERSION }}
+
+          ### Binary Sizes
+          - CLI: ${{ steps.sizes.outputs.CLI_SIZE }}
+          - GUI: ${{ steps.sizes.outputs.GUI_SIZE }}
+
+          **Commit**: ${{ github.sha }}
+        draft: false
+        prerelease: false
+        make_latest: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

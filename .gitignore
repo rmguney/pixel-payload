@@ -1,0 +1,146 @@
+# Object files
+*.o
+*.obj
+
+# Library files
+*.a
+*.lib
+
+# Debug files
+*.pdb
+*.ilk
+
+# Temporary test files
+test_*.bmp
+test_*.png
+sample_*.bmp
+sample_*.png
+test_*.txt
+demo_*.txt
+demo_*.png
+payload*.txt
+extracted*.txt
+*.bin
+test_steg_*
+
+# Development artifacts
+*.csx
+*_debug.c
+*_clean.c
+create_*.cs
+DemoImageCreator/
+
+# C# build artifacts
+bin/
+obj/
+*.deps.json
+*.runtimeconfig.json
+*.dll
+*.pdb
+*.cache
+project.assets.json
+project.nuget.cache
+*.nuget.dgspec.json
+*.nuget.g.props
+*.nuget.g.targets
+
+# Python cache and virtual environments
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+.venv/
+venv/
+env/
+ENV/
+.env
+.virtualenv
+
+# IDE files
+.vscode/
+.vs/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Build artifacts
+dist/
+*.dSYM/
+
+# Logs
+*.log
+
+# CMake build directories and files
+release/
+build/
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
+!CMakeLists.txt
+
+# CMake package files
+CPackConfig.cmake
+CPackSourceConfig.cmake
+_CPack_Packages/
+*.dmg
+*.rpm
+*.deb
+*.msi
+
+# Ninja build files
+.ninja_deps
+.ninja_log
+build.ninja
+
+# Additional Visual Studio / MSBuild files
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.sln
+*.suo
+*.user
+*.aps
+*.pch
+*.vspscc
+*_i.c
+*_p.c
+*.ncb
+*.tlb
+*.tlh
+*.bak
+*.cache
+*.ilk
+*.lib
+*.sbr
+*.sdf
+*.opensdf
+*.unsuccessfulbuild
+*.tmp
+*.tmp_proj
+*.idb
+*.res
+*.exp
+
+# Executables (but keep test binaries)
+!tests/bin/Debug/net6.0-windows/*.exe
+
+# Package archives
+*.zip
+*.tar.gz
+*.7z
+
+# Backup files
+*.backup
+*.old
